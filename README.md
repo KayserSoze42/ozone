@@ -3,9 +3,9 @@ _Python script that combines two of my favorite things: **regex** and **pytz**_
 
 ## About and Usage
 
-    import ozone
+    import Ozone
     
-    ozone.ozonize("20.04.2020 16:00 CET GMT")
+    Ozone.ozonize("20.04.2020 16:00 CET GMT")
 
 _The insides are held together by duct tape, but if you feed it a string in a format of:_
 
