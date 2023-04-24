@@ -23,7 +23,7 @@ _Format is optional, and if nothing is passed default is being used:_
 
     dd.mm.yyyy HH:MM (HH:MM) # 20.04.2020 16:20
     
-_If you are using dates in different formats, you can pass the custom format at the end using $, and separating evey item with a $_
+_If you are using dates in different formats, you can pass the custom format at the end using $, and separating every item with a $_
 
 _Available formats:_
 
