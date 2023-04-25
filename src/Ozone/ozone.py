@@ -1,6 +1,8 @@
 import re, pytz, calendar
+
 from datetime import datetime
 from enum import Enum
+from typing import Tuple, List
 
 
 class OzoneRegex(Enum):
@@ -12,13 +14,29 @@ class OzoneRegex(Enum):
     ydm = r''
     ymd = r''
     Mdy = r''
-    h12 = r'\s+(\d{1,2})\s?:?\s?(\d{0,2})\s?([AaPp]?\.?[Mm]?)\s+'
+    h12 = r'\s+(?P<hours>\d{1,2})\s?:?\s?(?P<minutes>\d{0,2})\s?(?P<ampm>[AaPp]?\.?[Mm]?)\s+'
     h24 = r''
+
+
+class OzoneDate:
+
+    def __init__(self, day, month, year, hours, minutes, ampm, timezone):
+
+        self.day = day
+        self.month = month
+        self.year = year
+
+        self.hours = hours
+        self.minutes = minutes
+        self.ampm = ampm
+
+        self.timezone = timezone
 
 
 class Ozone:
 
-    def ozonize(text: str) -> None:
+    @staticmethod
+    def ozonize(text: str) -> Tuple[str, str]:
 
 
         # Initialize the values
@@ -50,47 +68,90 @@ class Ozone:
 
             userInputZone = zones[0][0]
             userOutputZone = zones[0][1]
-            print(f"Input Timezone: {userInputZone}")
-            print(f"Output Timezone: {userOutputZone}")
 
+            # 3 chains?
             strippedText = strippedText.replace(userInputZone, "")
             strippedText = strippedText.replace(userOutputZone, "")
-            print(strippedText)
+            strippedText = strippedText.strip()
 
         except Exception as e:
             userInputZone = "CET"
             userOutputZone = "GMT"
+
+        # Get regular expression pattern for set format
+        regex = Ozone.getRegex(formatList)
+
+        try:
+            dateTimeMatchBox = re.match(regex, strippedText)
+
+            userInputDay = dateTimeMatchBox.group('day')
+            userInputMonth = dateTimeMatchBox.group('month')
+            userInputYear = dateTimeMatchBox.group('year')
+
+            userInputHoursStart = dateTimeMatchBox.group('hours')
+            userInputMinutesStart = dateTimeMatchBox.group('minutes')
+            userInputAmPmStart = dateTimeMatchBox.group('ampm')
+
+            userInputHoursEnd = dateTimeMatchBox.group('hours')
+            userInputMinutesEnd = dateTimeMatchBox.group('minutes')
+            userInputAmPmEnd = dateTimeMatchBox.group('ampm')
+
+        except Exception as e:
+            now = datetime.now()
+            userInputDay = now.day
+            userInputMonth = now.month
+            userInputYear = now.year
+
+            userInputHoursStart = now.hour
+            userInputMinutesStart = now.minute
+            userInputAmPmStart = ""
+
+        userInputDateTimeStart = OzoneDate(
+            userInputDay,
+            userInputMonth,
+            userInputYear,
+            userInputHoursStart,
+            userInputMinutesStart,
+            userInputAmPmStart
+        )
+
+        print(f"Input: {text}")
+        print(f"Format: {userFormat}")
+        print(f"Input Timezone: {userInputZone}")
+        print(f"Output Timezone: {userOutputZone}")
+
+        return outputStart, outputEnd
+
+
+    @staticmethod
+    def getRegex(formatList: List[str]) -> str:
+
+        dateRegex = ""
+        timeRegex = ""
 
         for format in formatList:
 
             match format:
 
                 case "12":
-                    print("12")
-                    userTime = re.findall(OzoneRegex.h12.value, strippedText)
-                    for time in userTime:
-                        print(f"Hours: {time[0]}, minutes: {time[1]}, am/pm: {time[2]}")
+                    timeRegex = OzoneRegex.h12.value
+
                 case "24":
-                    print("24")
+                    timeRegex = OzoneRegex.h24.value
+
                 case "dmy":
-                    print("dmy")
+                    dateRegex = OzoneRegex.dmy.value
+
                 case "mdy":
-                    print("mdy")
+                    dateRegex = OzoneRegex.mdy.value
+
                 case "ymd":
-                    print("ymd")
+                    dateRegex = OzoneRegex.ymd.value
+
                 case "ydm":
-                    print("ydm")
+                    dateRegex = OzoneRegex.ydm.value
+
                 case "Mdy":
-                    print("Mdy")
+                    dateRegex = OzoneRegex.Mdy.value
 
-        print(f"Input: {text}")
-        print(f"Format: {userFormat}")
-
-
-
-
-
-
-
-
-Ozone.ozonize("20 04 2020 4 PM - 5 PM CET GMT $12")
+        return f"{dateRegex} {timeRegex}"

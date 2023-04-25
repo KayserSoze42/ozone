@@ -1,9 +1,11 @@
 # ozone
 _Python script that combines two of my favorite things: **regex** and **pytz**_
 
+_Like anything else I shared, it's in perpetual development. You can play with the broken version [here](http://www.plaintech.ink/ozone)._
+
 ## About and Usage
 
-    import Ozone
+    from Ozone import Ozone
     
     Ozone.ozonize("20.04.2020 16:00 CET GMT")
 
