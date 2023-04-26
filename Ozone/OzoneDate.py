@@ -1,35 +1,10 @@
-import pytz, calendar
+from typing import Any
 
-from enum import Enum
-from typing import Any, List
+import calendar
+import pytz
 
 
-class OzoneConstants(Enum):
-    # REGEX
-    format = r'(\$.*)\s*$'
 
-    timezones = r'\s+(\D\S*)\s?(\D\S*)$'
-
-    dmy = r''
-
-    mdy = r''
-
-    ydm = r''
-
-    ymd = r''
-
-    Mdy = r''
-
-    h12 = r'\s+(?P<hours_start>\d{1,2})\s?:?\s?(?P<minutes_start>\d{0,2})\s?(?P<ampm_start>[AaPp]?\.?[Mm]?)\s?[->]?\s?' \
-          r'(?P<hours_end>\d{1,2})\s?:?\s?(?P<minutes_end>\d{0,2})\s?(?P<ampm_end>[AaPp]?\.?[Mm]?)\s*'
-
-    h24 = r''
-
-    # MONTHS
-
-    monthNames: List[str] = [str(month).lower() for month in calendar.month_name if month]
-
-    monthNamesAbbr: List[str] = [str(month).lower() for month in calendar.month_abbr if month]
 
 
 class OzoneDate:
@@ -46,25 +21,49 @@ class OzoneDate:
 
         self.timezone = self.setUpTimezone(timezone)
 
+    def __str__(self):
+        return f"{self.day}.{self.month}.{self.year} {self.hours}:{self.minutes} {self.ampm} {self.timezone}"
+
     def setUpDay(self, day: Any) -> int:
         formattedDay = 0
 
+        # Try for week day number
         try:
-            formattedDay = int(day)
-
+            return int(day)
         except:
             pass
+
+        # Try for week day names and abbreviations
+        dayNames = {str(day).lower(): index for index, day in enumerate(calendar.day_name) if day}
+        dayNamesAbbr = {str(day).lower(): index for index, day in enumerate(calendar.day_abbr) if day}
+
+        if type(day) is str:
+            if day.lower() in dayNames:
+                formattedDay = dayNames[day.lower()]
+            elif day.lower() in dayNamesAbbr:
+                formattedDay = dayNamesAbbr[day.lower()]
 
         return formattedDay
 
     def setUpMonth(self, month: Any) -> int:
         formattedMonth = 0
 
+        # Try for month number
         try:
-            formattedMonth = int(month)
+            return int(month)
 
         except:
             pass
+
+        # Try for month names and abbreviations
+        monthNames = {str(month).lower(): index for index, month in enumerate(calendar.month_name) if month}
+        monthNamesAbbr = {str(month).lower(): index for index, month in enumerate(calendar.month_abbr) if month}
+
+        if type(month) is str:
+            if month.lower() in monthNames:
+                formattedMonth = monthNames[month.lower()]
+            elif month.lower() in monthNamesAbbr:
+                formattedMonth = monthNamesAbbr[month.lower()]
 
         return formattedMonth
 
@@ -112,5 +111,7 @@ class OzoneDate:
             pass
 
         return formattedZone
+
+
 
 
