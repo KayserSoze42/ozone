@@ -3,7 +3,7 @@ from typing import Any
 import calendar
 import pytz
 
-
+from datetime import datetime
 
 
 
@@ -15,14 +15,24 @@ class OzoneDate:
         self.month = self.setUpMonth(month)
         self.year = self.setUpYear(year)
 
+        self.ampm = ampm.lower()
         self.hours = self.setUpHours(hours)
         self.minutes = self.setUpMinutes(minutes)
-        self.ampm = ampm
 
         self.timezone = self.setUpTimezone(timezone)
 
+        self.dateTime = self.timezone.localize(datetime(
+            self.year,
+            self.month,
+            self.day,
+            self.hours,
+            self.minutes
+        ))
+
     def __str__(self):
         return f"{self.day}.{self.month}.{self.year} {self.hours}:{self.minutes} {self.ampm} {self.timezone}"
+
+
 
     def setUpDay(self, day: Any) -> int:
         formattedDay = 0
@@ -71,7 +81,7 @@ class OzoneDate:
         formattedYear = 0
 
         try:
-            formattedYear = int(year)
+            return int(year)
 
         except:
             pass
@@ -83,6 +93,15 @@ class OzoneDate:
 
         try:
             formattedHours = int(hours)
+
+            if self.ampm == "pm":
+                if formattedHours == 12:
+                    return 12
+                formattedHours += 12
+
+            elif self.ampm == "am":
+                if formattedHours == 12:
+                    return 0
 
         except:
             pass
@@ -100,7 +119,7 @@ class OzoneDate:
 
         return formattedMinutes
 
-    def setUpTimezone(self, timezone: Any) -> str:
+    def setUpTimezone(self, timezone: Any) -> pytz.timezone:
         # Where the fun lies
         formattedZone = ""
 

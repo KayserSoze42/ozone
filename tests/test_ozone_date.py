@@ -23,13 +23,13 @@ for i in range(1, 101):
     # Get random time zone
     randomTimeZone = validTimezones[random.randint(0, len(validTimezones)-1)]
 
-    # Append "20.04.2020 4:20 PM CET" type date elements to valid date list
+    # Append "20.04.2020 04:20 PM CET" type date elements to valid date list
     validDates.append([
-        randomDate.day,
-        randomDate.month,
-        randomDate.year,
-        randomDate.hour,
-        randomDate.minute,
+        randomDate.strftime("%d"),
+        randomDate.strftime("%m"),
+        randomDate.strftime("%Y"),
+        randomDate.strftime("%I"),
+        randomDate.strftime("%M"),
         randomTimeZone,
         randomDate.strftime("%p").lower()
     ])
@@ -52,10 +52,18 @@ def test_ozone_date_set_attributes() -> None:
         )
 
         # Test the initialization of the OzoneDate and confirm the attributes values
-        assert randomOzoneDate.day == day
-        assert randomOzoneDate.month == month
-        assert randomOzoneDate.year == year
-        assert randomOzoneDate.hours == hour
-        assert randomOzoneDate.minutes == minute
+        assert randomOzoneDate.day == int(day)
+        assert randomOzoneDate.month == int(month)
+        assert randomOzoneDate.year == int(year)
+
+        # Set up the time
+        if ampm == "pm":
+            hour = 12 if int(hour) == 12 else int(hour) + 12
+        elif ampm == "am":
+            if int(hour) == 12:
+                hour = 0
+        assert randomOzoneDate.hours == int(hour)
+
+        assert randomOzoneDate.minutes == int(minute)
         assert randomOzoneDate.timezone == pytz.timezone(timezone)
         assert randomOzoneDate.ampm == ampm
