@@ -40,6 +40,8 @@ def test_ozone_date_set_attributes() -> None:
     # Iterate over the list of valid date elements
     for day, month, year, hour, minute, timezone, ampm in validDates:
 
+
+
         # Construct an OzoneDate object with generated data
         randomOzoneDate = OzoneDate(
             day,
@@ -62,8 +64,14 @@ def test_ozone_date_set_attributes() -> None:
         elif ampm == "am":
             if int(hour) == 12:
                 hour = 0
+
+        # Test for the time set
         assert randomOzoneDate.hours == int(hour)
 
         assert randomOzoneDate.minutes == int(minute)
         assert randomOzoneDate.timezone == pytz.timezone(timezone)
         assert randomOzoneDate.ampm == ampm
+
+        currentString = f"{day:02}.{month:02}.{year:04} {hour:02}:{minute:02} {ampm} {timezone}"
+
+        assert str(randomOzoneDate) == currentString
