@@ -6,9 +6,7 @@ import pytz
 from datetime import datetime
 
 
-
 class OzoneDate:
-
     def __init__(self, day, month, year, hours, minutes, timezone, ampm=""):
 
         self.day = self.setUpDay(day)
@@ -21,23 +19,30 @@ class OzoneDate:
 
         self.timezone = self.setUpTimezone(timezone)
 
-        self.dateTime = None
+        self._dateTime: Any = None
 
     def __str__(self):
-        return f"{self.day:02d}.{self.month:02d}.{self.year:04d} {self.hours:02d}:{self.minutes:02d} {self.ampm} {self.timezone}"
+        return f"{self.day:02d}.{self.month:02d}.{self.year:04d} {self.hours:02d}:{self.minutes:02d} ({self.ampm}) {self.timezone}"
+
+    def asTimeZone(self, timezone: Any) -> Any:
+        if self._dateTime is not None:
+            return self._dateTime.astimezone(timezone)
+        else:
+            try:
+                return self.getDateTimeLocalized().astimezone(timezone)
+            except Exception as e:
+                return None
 
     def getDateTimeLocalized(self) -> datetime:
-        if self.dateTime is None:
-            self.dateTime = self.timezone.localize(datetime(
+        if self._dateTime is None:
+            self._dateTime = self.timezone.localize(datetime(
                 self.year,
                 self.month,
                 self.day,
                 self.hours,
                 self.minutes
             ))
-        return self.dateTime
-
-
+        return self._dateTime
 
     def setUpDay(self, day: Any) -> int:
         formattedDay = 0
@@ -45,7 +50,7 @@ class OzoneDate:
         # Try for week day number
         try:
             return int(day)
-        except:
+        except Exception as e:
             pass
 
         # Try for week day names and abbreviations
@@ -67,7 +72,7 @@ class OzoneDate:
         try:
             return int(month)
 
-        except:
+        except Exception as e:
             pass
 
         # Try for month names and abbreviations
@@ -88,7 +93,7 @@ class OzoneDate:
         try:
             return int(year)
 
-        except:
+        except Exception as e:
             pass
 
         return formattedYear
@@ -108,7 +113,7 @@ class OzoneDate:
                 if formattedHours == 12:
                     return 0
 
-        except:
+        except Exception as e:
             pass
 
         return formattedHours
@@ -119,7 +124,7 @@ class OzoneDate:
         try:
             formattedMinutes = int(minutes)
 
-        except:
+        except Exception as e:
             pass
 
         return formattedMinutes
@@ -131,7 +136,7 @@ class OzoneDate:
         try:
             formattedZone = pytz.timezone(timezone)
 
-        except:
+        except Exception as e:
             pass
 
         return formattedZone

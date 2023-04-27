@@ -4,7 +4,7 @@ import string
 import pytz
 import random
 
-from Ozone.Ozone import Constants
+from Ozone.Ozone import Ozone, Constants
 from datetime import datetime
 
 # Generate valid data for testing
@@ -44,11 +44,38 @@ for i in range(1, 101):
 
     # Append "20.04.2020 16 ETC GMT $24" type string elements to valid string list
     validStrings.append([
-        randomDate.strftime("%d/%m/%Y"),
+        randomDate.strftime("%d.%m.%Y"),
         randomDate.strftime("%H"),
         randomTimeZoneInput,
         randomTimeZoneOutput,
         "$24"
+    ])
+
+    # Append "04/20/2020 16 ETC GMT $24$mdy" type string elements to valid string list
+    validStrings.append([
+        randomDate.strftime("%m/%d/%Y"),
+        randomDate.strftime("%H"),
+        randomTimeZoneInput,
+        randomTimeZoneOutput,
+        "$24$mdy"
+    ])
+
+    # Append "2020-20-04 4-5 ETC GMT $12$ydm" type string elements to valid string list
+    validStrings.append([
+        randomDate.strftime("%y-%d-%m"),
+        randomDate.strftime("%H"),
+        randomTimeZoneInput,
+        randomTimeZoneOutput,
+        "$12$ydm"
+    ])
+
+    # Append "04/20/2020 16 ETC GMT $24$mdy" type string elements to valid string list
+    validStrings.append([
+        randomDate.strftime("%m/%d/%Y"),
+        randomDate.strftime("%H"),
+        randomTimeZoneInput,
+        randomTimeZoneOutput,
+        "$24$mdy"
     ])
 
 # Generate invalid data for testing
@@ -78,7 +105,7 @@ for i in range(1, 101):
     )
 
 
-def test_regex_valid_string_contents() -> None:
+def test_regex_flow_with_valid_string_data() -> None:
 
     # Iterate over the list of valid string elements
     for genDate, genTime, genTimeZoneInput, genTimeZoneOutput, genFormat in validStrings:
@@ -100,7 +127,45 @@ def test_regex_valid_string_contents() -> None:
         # Test for the content of the output time zone passed in
         assert timezones[1] == genTimeZoneOutput
 
-def test_regex_invalid_string_contents() -> None:
+        # Strip some more
+        strippedText = strippedText.replace(timezones[0], "")
+        strippedText = strippedText.replace(timezones[1], "")
+        strippedText = strippedText.strip()
+
+        # Get the date and time regex for the current format
+        genRegex = re.compile(Ozone.getRegex(genFormat.split("$")[1::]))
+
+        # Test for the regex pattern to match passed date and time(the whole, remainder of the strippedText)
+        assert strippedText == re.match(genRegex, strippedText)[0]
+
+
+def test_regex_separated_logic_with_valid_string_data() -> None:
+
+    # Iterate over the list of random valid string elements
+    for genDate, genTime, genTimeZoneInput, genTimeZoneOutput, genFormat in validStrings:
+
+        # Test for the date and time regex to match for the passed date and time
+        # Since this part is tricky, and it mostly depends on the format user passed, call Ozone.getRegex to help
+        # Tl;dr I didn't want to create new lists for each of the formats
+        dateTimeRegex = Ozone.getRegex(genFormat.split('$')[1::])
+        assert f"{genDate} {genTime}" == re.search(dateTimeRegex, f"{genDate} {genTime}")[0]
+
+        # Test for the time zone regex to match the passed time zones
+        # Oy bother, another trouble
+        # Build string, since again, logic requires two zones to be passed at once
+        timeZoneString = f" {genTimeZoneInput} {genTimeZoneOutput}"
+        genTimeZones = re.findall(Constants.timezones.value, timeZoneString)[0]
+        assert genTimeZoneInput == genTimeZones[0]
+        assert genTimeZoneOutput == genTimeZones[1]
+
+        # Test for the format regex to match the passed format
+        assert genFormat == re.search(Constants.format.value, genFormat)[0]
+
+        # Get date and time regex for the current format
+        genRegex = re.compile(Ozone.getRegex(genFormat.split("$")[1::]))
+
+
+def test_regex_flow_with_invalid_string_data() -> None:
 
     # Iterate over the list of random invalid strings
     for invalidString in randomInvalidStrings:

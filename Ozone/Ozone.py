@@ -12,20 +12,21 @@ class Constants(Enum):
 
     timezones = r'\s+(\D\S*) (\D\S*)$'
 
-    dmy = r''
+    dmy = r'\s*(?P<date_day>\d{1,2})[\./-]?(?P<date_month>\d{1,2})[\./-](?P<date_year>\d{2,4})\s*'
 
-    mdy = r''
+    mdy = r'\s*(?P<date_month>\d{1,2})\s?[\./-]?\s?(?P<date_day>\d{1,2})\s?[\./-]?\s?(?P<date_year>\d{2,4})\s*'
 
-    ydm = r''
+    ydm = r'\s*(?P<date_year>\d{2,4})\s?[\./-]?\s?(?P<date_day>\d{1,2})\s?[\./-]?\s?(?P<date_month>\d{1,2})\s*'
 
-    ymd = r''
+    ymd = r'\s*(?P<date_year>\d{2,4})\s?[\./-]?\s?(?P<date_month>\d{1,2})\s?[\./-]?\s?(?P<date_date>\d{1,2})\s*'
 
     Mdy = r''
 
-    h12 = r'\s+(?P<hours_start>\d{1,2})\s?:?\s?(?P<minutes_start>\d{0,2})\s?(?P<ampm_start>[AaPp]?\.?[Mm]?)\s?[->]?\s?' \
-          r'(?P<hours_end>\d{1,2})\s?:?\s?(?P<minutes_end>\d{0,2})\s?(?P<ampm_end>[AaPp]?\.?[Mm]?)\s*'
+    h12 = r'\s*(?P<hours_start>\d{1,2})\s?:?\s?(?P<minutes_start>\d{0,2})\s?(?P<ampm_start>[AaPp]?\.?[Mm]?)\s?[->]?\s?' \
+          r'(?P<hours_end>\d{0,2})\s?:?\s?(?P<minutes_end>\d{0,2})\s?(?P<ampm_end>[AaPp]?\.?[Mm]?)\s*'
 
-    h24 = r''
+    h24 = r'\s*(?P<hours_start>\d{1,2})\s?:?\s?(?P<minutes_start>\d{0,2})\s?[->]?\s?' \
+          r'(?P<hours_end>\d{0,2})\s?:?\s?(?P<minutes_end>\d{0,2})\s*'
 
 class Ozone:
 
@@ -73,14 +74,14 @@ class Ozone:
             userOutputZone = "GMT"
 
         # Get regular expression pattern for set format
-        regex = Ozone.getRegex(formatList)
+        regex = re.compile(Ozone.getRegex(formatList))
 
         try:
             dateTimeMatchBox = re.match(regex, strippedText)
 
-            userInputDay = dateTimeMatchBox.group('day')
-            userInputMonth = dateTimeMatchBox.group('month')
-            userInputYear = dateTimeMatchBox.group('year')
+            userInputDay = dateTimeMatchBox.group('date_day')
+            userInputMonth = dateTimeMatchBox.group('date_month')
+            userInputYear = dateTimeMatchBox.group('date_year')
 
             userInputHoursStart = dateTimeMatchBox.group('hours_start')
             userInputMinutesStart = dateTimeMatchBox.group('minutes_start')
@@ -102,9 +103,9 @@ class Ozone:
                 userInputMinutesStart,
                 userInputAmPmStart,
                 userInputZone
-            )
+            ).asTimeZone(userOutputZone)
 
-            outputStart = str(userInputDateTimeStart)
+            outputStart = userInputDateTimeStart.strftime("%d.%m.%Y %H:%M ") + f" {userOutputZone}"
 
             if userInputHoursEnd is not None:
 
@@ -116,9 +117,9 @@ class Ozone:
                     userInputMinutesEnd,
                     userInputAmPmEnd,
                     userInputZone
-                )
+                ).asTimeZone(userOutputZone)
 
-                outputEnd = str(userInputDateTimeEnd)
+                outputEnd = userInputDateTimeEnd.strftime("%d.%m.%Y %H:%M ") + f" {userOutputZone}"
 
         except:
             pass
@@ -127,7 +128,7 @@ class Ozone:
 
 
     @staticmethod
-    def getRegex(formatList: List[str]) -> str:
+    def getRegex(formatList: List[str]) -> re.Pattern:
 
         dateRegex = ""
         timeRegex = ""
@@ -157,7 +158,10 @@ class Ozone:
                 case "Mdy":
                     dateRegex = Constants.Mdy.value
 
-        return f"{dateRegex} {timeRegex}"
+        dateRegex = Constants.dmy.value if dateRegex == "" else dateRegex
+        timeRegex = Constants.h24.value if timeRegex == "" else timeRegex
+
+        return re.compile(f"{dateRegex} {timeRegex}")
 
 
 testOzone = Ozone.ozonize("04.20.2020 04:00 PM CET GMT $12")
