@@ -80,7 +80,6 @@ for i in range(1, 101):
         "$24$mdy"
     ])
 
-
 # Generate invalid data for testing
 randomInvalidStrings = []
 
@@ -133,15 +132,13 @@ def test_ozonize_with_valid_string_data_and_mock_logic() -> None:
             testData.group('minutes_start'),
             genTimeZoneInput,
             ampm=testAmPm
-        ).asTimeZone(genTimeZoneOutput)
+        )
 
-        expectedString = testDateTime.strftime("%d.%m.%Y %H:%M ") + f" {genTimeZoneOutput}"
+        expectedString = testDateTime\
+                             .asTimeZone(pytz.timezone(genTimeZoneOutput))\
+                             .strftime("%d.%m.%Y %H:%M") + f" {genTimeZoneOutput}"
 
         assert expectedString == Ozone.ozonize(testString)
-
-
-
-
 
 
 def test_ozonize_returns_empty() -> None:

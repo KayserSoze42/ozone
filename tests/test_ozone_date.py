@@ -66,10 +66,13 @@ def test_ozone_date_set_attributes() -> None:
         # Test for the time set
         assert randomOzoneDate.hours == int(hour)
 
+        # Test for the rest
         assert randomOzoneDate.minutes == int(minute)
         assert randomOzoneDate.timezone == pytz.timezone(timezone)
         assert randomOzoneDate.ampm == ampm
 
+        # Build the string from the current data
         currentString = f"{day:02}.{month:02}.{year:04} {hour:02}:{minute:02} ({ampm}) {timezone}"
 
+        # Test for the __str__ method
         assert str(randomOzoneDate) == currentString

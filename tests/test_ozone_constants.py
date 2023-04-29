@@ -147,8 +147,10 @@ def test_regex_separated_logic_with_valid_string_data() -> None:
         # Test for the date and time regex to match for the passed date and time
         # Since this part is tricky, and it mostly depends on the format user passed, call Ozone.getRegex to help
         # Tl;dr I didn't want to create new lists for each of the formats
-        dateTimeRegex = Ozone.getRegex(genFormat.split('$')[1::])
-        assert f"{genDate} {genTime}" == re.search(dateTimeRegex, f"{genDate} {genTime}")[0]
+        genCommands = genFormat.split('$')[1::]
+        dateTimeRegex = Ozone.getRegex(genCommands)
+        dateTimeMatch = re.search(dateTimeRegex, f"{genDate} {genTime}")
+        assert f"{genDate} {genTime}" == dateTimeMatch[0]
 
         # Test for the time zone regex to match the passed time zones
         # Oy bother, another trouble
@@ -161,8 +163,7 @@ def test_regex_separated_logic_with_valid_string_data() -> None:
         # Test for the format regex to match the passed format
         assert genFormat == re.search(Constants.format.value, genFormat)[0]
 
-        # Get date and time regex for the current format
-        genRegex = re.compile(Ozone.getRegex(genFormat.split("$")[1::]))
+
 
 
 def test_regex_flow_with_invalid_string_data() -> None:

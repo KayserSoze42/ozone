@@ -33,7 +33,6 @@ class Ozone:
     @staticmethod
     def ozonize(text: str) -> Tuple[str, str]:
 
-
         # Initialize the values
         text = text.strip()
         strippedText = ""
@@ -47,31 +46,11 @@ class Ozone:
         # Work backwards, format -> zones -> time(s) -> date
 
         # Check for passed format, else set default and shorten the user input text
-        try:
-            userFormat = re.search(Constants.format.value, text)[0]
-            strippedText = text.replace(userFormat, "").strip()
-
-        except Exception as e:
-            userFormat = "$dmy$24"
-            strippedText = text.strip()
-
+        strippedText, userFormat = Ozone.extractFormat(text)
         formatList = userFormat.split("$")[1::]
 
-        # Check for the timezones, else set default and shorten the user input text
-        try:
-            zones = re.findall(Constants.timezones.value, strippedText)
-
-            userInputZone = zones[0][0]
-            userOutputZone = zones[0][1]
-
-            # 3 chains?
-            strippedText = strippedText.replace(userInputZone, "")
-            strippedText = strippedText.replace(userOutputZone, "")
-            strippedText = strippedText.strip()
-
-        except Exception as e:
-            userInputZone = "CET"
-            userOutputZone = "GMT"
+        # Check for the timezones and shorten the user input text, else raise KeyError
+        strippedText, userInputZone, userOutputZone = Ozone.extractTimeZones(strippedText)
 
         # Get regular expression pattern for set format
         regex = re.compile(Ozone.getRegex(formatList))
@@ -85,11 +64,14 @@ class Ozone:
 
             userInputHoursStart = dateTimeMatchBox.group('hours_start')
             userInputMinutesStart = dateTimeMatchBox.group('minutes_start')
-            userInputAmPmStart = dateTimeMatchBox.group('ampm_start')
 
-            userInputHoursEnd = dateTimeMatchBox.group('hours_end')
-            userInputMinutesEnd = dateTimeMatchBox.group('minutes_end')
-            userInputAmPmEnd = dateTimeMatchBox.group('ampm_end')
+            if dateTimeMatchBox.group('ampm_start') is not None:
+                userInputAmPmStart = dateTimeMatchBox.group('ampm_start')
+
+            if dateTimeMatchBox.group('hours_end') is not None:
+                userInputHoursEnd = dateTimeMatchBox.group('hours_end')
+                userInputMinutesEnd = dateTimeMatchBox.group('minutes_end')
+                userInputAmPmEnd = dateTimeMatchBox.group('ampm_end')
 
         except Exception as e:
             return '', ''
@@ -125,6 +107,40 @@ class Ozone:
             pass
 
         return outputStart, outputEnd
+
+    @staticmethod
+    def extractFormat(text: str) -> Tuple[str, str]:
+
+        try:
+            userFormat = re.search(Constants.format.value, text)[0]
+            strippedText = text.replace(userFormat, "").strip()
+
+        except Exception as e:
+            userFormat = "$dmy$24"
+            strippedText = text.strip()
+
+        finally:
+            return strippedText, userFormat
+
+    @staticmethod
+    def extractTimeZones(text: str) -> Tuple[str, str, str]:
+
+        try:
+            zones = re.findall(Constants.timezones.value, text)
+
+            inputZone = zones[0][0]
+            outputZone = zones[0][1]
+
+            # 3 chains?
+            strippedText = text.replace(inputZone, "")
+            strippedText = strippedText.replace(outputZone, "")
+            strippedText = strippedText.strip()
+
+        except Exception as e:
+            raise KeyError(f"Unable to extract time zones from passed text: {text}")
+
+        finally:
+            return strippedText, inputZone, outputZone
 
 
     @staticmethod

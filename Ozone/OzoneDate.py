@@ -19,7 +19,13 @@ class OzoneDate:
 
         self.timezone = self.setUpTimezone(timezone)
 
-        self._dateTime: Any = None
+        self._dateTime: datetime = datetime(
+            self.year,
+            self.month,
+            self.day,
+            self.hours,
+            self.minutes
+        )
 
     def __str__(self):
         return f"{self.day:02d}.{self.month:02d}.{self.year:04d} {self.hours:02d}:{self.minutes:02d} ({self.ampm}) {self.timezone}"
@@ -28,21 +34,7 @@ class OzoneDate:
         if self._dateTime is not None:
             return self._dateTime.astimezone(timezone)
         else:
-            try:
-                return self.getDateTimeLocalized().astimezone(timezone)
-            except Exception as e:
-                return None
-
-    def getDateTimeLocalized(self) -> datetime:
-        if self._dateTime is None:
-            self._dateTime = self.timezone.localize(datetime(
-                self.year,
-                self.month,
-                self.day,
-                self.hours,
-                self.minutes
-            ))
-        return self._dateTime
+            None
 
     def setUpDay(self, day: Any) -> int:
         formattedDay = 0
