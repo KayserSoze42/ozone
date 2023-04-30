@@ -34,7 +34,7 @@ class OzoneDate:
         if self._dateTime is not None:
             return self._dateTime.astimezone(timezone)
         else:
-            None
+            return None
 
     def setUpDay(self, day: Any) -> int:
         formattedDay = 0

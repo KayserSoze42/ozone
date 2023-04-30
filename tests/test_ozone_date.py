@@ -1,44 +1,13 @@
 from datetime import datetime
-import random
-
 import pytz
 
 from Ozone.OzoneDate import OzoneDate
 
 
-
-# Generate valid data for testing
-validTimezones = [zone for zone in pytz.all_timezones]
-validDates = []
-
-# Get time stamp for current time, rounded is good enough imho
-currentTimeStampRounded = round(datetime.now().timestamp())
-
-# Generate 100 valid sets of date elements
-for i in range(1, 101):
-
-    # Get a random date between 1st of January 1970 and now (rounded)
-    randomDate = datetime.fromtimestamp(random.randint(1, currentTimeStampRounded))
-
-    # Get random time zone
-    randomTimeZone = validTimezones[random.randint(0, len(validTimezones)-1)]
-
-    # Append "20.04.2020 04:20 PM CET" type date elements to valid date list
-    validDates.append([
-        randomDate.strftime("%d"),
-        randomDate.strftime("%m"),
-        randomDate.strftime("%Y"),
-        randomDate.strftime("%I"),
-        randomDate.strftime("%M"),
-        randomTimeZone,
-        randomDate.strftime("%p").lower()
-    ])
-
-
-def test_ozone_date_set_attributes() -> None:
+def test_ozone_date_set_attributes(valid_dates) -> None:
 
     # Iterate over the list of valid date elements
-    for day, month, year, hour, minute, timezone, ampm in validDates:
+    for day, month, year, hour, minute, timezone, ampm in valid_dates:
 
         # Construct an OzoneDate object with generated data
         randomOzoneDate = OzoneDate(
@@ -51,7 +20,18 @@ def test_ozone_date_set_attributes() -> None:
             ampm
         )
 
+        # Construct an datetime object with generated data
+        randomDateTime = datetime(
+            randomOzoneDate.year,
+            randomOzoneDate.month,
+            randomOzoneDate.day,
+            randomOzoneDate.hours,
+            randomOzoneDate.minutes
+        )
+
         # Test the initialization of the OzoneDate and confirm the attributes values
+
+        # Test for the date to match value and type
         assert randomOzoneDate.day == int(day)
         assert randomOzoneDate.month == int(month)
         assert randomOzoneDate.year == int(year)
@@ -63,16 +43,25 @@ def test_ozone_date_set_attributes() -> None:
             if int(hour) == 12:
                 hour = 0
 
-        # Test for the time set
+        # Test for the time to match value and type
         assert randomOzoneDate.hours == int(hour)
-
-        # Test for the rest
         assert randomOzoneDate.minutes == int(minute)
-        assert randomOzoneDate.timezone == pytz.timezone(timezone)
         assert randomOzoneDate.ampm == ampm
+
+        # Set current time zone
+        genTimeZone = pytz.timezone(timezone)
+
+        # Test the time zone to match
+        assert randomOzoneDate.timezone == genTimeZone
 
         # Build the string from the current data
         currentString = f"{day:02}.{month:02}.{year:04} {hour:02}:{minute:02} ({ampm}) {timezone}"
 
         # Test for the __str__ method
         assert str(randomOzoneDate) == currentString
+
+        # Test for the datetime.astimezone to return the same as OzoneDate.asTimeZone
+        assert randomDateTime.astimezone(genTimeZone) == randomOzoneDate.asTimeZone(genTimeZone)
+
+
+

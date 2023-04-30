@@ -10,7 +10,7 @@ class Constants(Enum):
     # REGEX
     format = r'(\$.*)\s*$'
 
-    timezones = r'\s+(\D\S*) (\D\S*)$'
+    timezones = r'\s*(\D\S*) (\D\S*)$'
 
     dmy = r'\s*(?P<date_day>\d{1,2})[\./-]?(?P<date_month>\d{1,2})[\./-](?P<date_year>\d{2,4})\s*'
 
@@ -55,49 +55,44 @@ class Ozone:
         # Get regular expression pattern for set format
         regex = re.compile(Ozone.getRegex(formatList))
 
-        try:
-            dateTimeMatchBox = re.match(regex, strippedText)
+        # Extract date and time elements from the text using the regex
+        userDate, userTimeStart, userTimeEnd = Ozone.extractDateTimeData(strippedText, regex)
 
-            userInputDay = dateTimeMatchBox.group('date_day')
-            userInputMonth = dateTimeMatchBox.group('date_month')
-            userInputYear = dateTimeMatchBox.group('date_year')
+        # Set up the date and time data received
+        userDay = userDate[0]
+        userMonth = userDate[1]
+        userYear = userDate[2]
 
-            userInputHoursStart = dateTimeMatchBox.group('hours_start')
-            userInputMinutesStart = dateTimeMatchBox.group('minutes_start')
+        userHoursStart = userTimeStart[0]
+        userMinutesStart = userTimeStart[1]
+        userAmPmStart = userTimeStart[2] if userTimeStart[2] is not None else ""
 
-            if dateTimeMatchBox.group('ampm_start') is not None:
-                userInputAmPmStart = dateTimeMatchBox.group('ampm_start')
-
-            if dateTimeMatchBox.group('hours_end') is not None:
-                userInputHoursEnd = dateTimeMatchBox.group('hours_end')
-                userInputMinutesEnd = dateTimeMatchBox.group('minutes_end')
-                userInputAmPmEnd = dateTimeMatchBox.group('ampm_end')
-
-        except Exception as e:
-            return '', ''
+        userHoursEnd = userTimeEnd[0]
+        userMinutesEnd = userTimeEnd[1]
+        userAmPmEnd = userTimeEnd[2] if userTimeEnd[2] is not None else ""
 
         try:
             userInputDateTimeStart = OzoneDate(
-                userInputDay,
-                userInputMonth,
-                userInputYear,
-                userInputHoursStart,
-                userInputMinutesStart,
-                userInputAmPmStart,
+                userDay,
+                userMonth,
+                userYear,
+                userHoursStart,
+                userMinutesStart,
+                userAmPmStart,
                 userInputZone
             ).asTimeZone(userOutputZone)
 
             outputStart = userInputDateTimeStart.strftime("%d.%m.%Y %H:%M ") + f" {userOutputZone}"
 
-            if userInputHoursEnd is not None:
+            if userHoursEnd != "":
 
                 userInputDateTimeEnd = OzoneDate(
-                    userInputDay,
-                    userInputMonth,
-                    userInputYear,
-                    userInputHoursEnd,
-                    userInputMinutesEnd,
-                    userInputAmPmEnd,
+                    userDay,
+                    userMonth,
+                    userYear,
+                    userHoursEnd,
+                    userMinutesEnd,
+                    userAmPmEnd,
                     userInputZone
                 ).asTimeZone(userOutputZone)
 
@@ -107,6 +102,57 @@ class Ozone:
             pass
 
         return outputStart, outputEnd
+
+    @staticmethod
+    def extractDateTimeData(text: str, regex: re.Pattern):
+        date = []
+        timeStart = []
+        timeEnd = []
+
+        dateTimeMatchBox = re.match(regex, text)
+
+        try:
+            inputDay = dateTimeMatchBox.group('date_day')
+            inputMonth = dateTimeMatchBox.group('date_month')
+            inputYear = dateTimeMatchBox.group('date_year')
+
+            inputHoursStart = dateTimeMatchBox.group('hours_start')
+            inputMinutesStart = dateTimeMatchBox.group('minutes_start')
+
+            date.append(inputDay)
+            date.append(inputMonth)
+            date.append(inputYear)
+
+            timeStart.append(inputHoursStart)
+            timeStart.append(inputMinutesStart)
+
+        except Exception as e:
+            raise ValueError(f"Unable to extract date and time values from text: {text}")
+
+        try:
+            inputAmPmStart = dateTimeMatchBox.group('ampm_start')
+            timeStart.append(inputAmPmStart)
+        except:
+            timeStart.append("")
+
+        try:
+            inputHoursEnd = dateTimeMatchBox.group('hours_end')
+            inputMinutesEnd = dateTimeMatchBox.group('minutes_end')
+
+            timeEnd.append(inputHoursEnd)
+            timeEnd.append(inputMinutesEnd)
+        except:
+            timeEnd.append("")
+            timeEnd.append("")
+
+        try:
+            inputAmPmEnd = dateTimeMatchBox.group('ampm_end')
+
+            timeEnd.append(inputAmPmEnd)
+        except:
+            timeEnd.append("")
+
+        return date, timeStart, timeEnd
 
     @staticmethod
     def extractFormat(text: str) -> Tuple[str, str]:
@@ -132,16 +178,13 @@ class Ozone:
             outputZone = zones[0][1]
 
             # 3 chains?
-            strippedText = text.replace(inputZone, "")
-            strippedText = strippedText.replace(outputZone, "")
-            strippedText = strippedText.strip()
+            strippedText = re.sub(Constants.timezones.value, "", text).strip()
+
+
+            return strippedText, inputZone, outputZone
 
         except Exception as e:
             raise KeyError(f"Unable to extract time zones from passed text: {text}")
-
-        finally:
-            return strippedText, inputZone, outputZone
-
 
     @staticmethod
     def getRegex(formatList: List[str]) -> re.Pattern:
