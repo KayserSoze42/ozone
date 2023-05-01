@@ -77,7 +77,7 @@ class OzoneDate:
             elif month.lower() in monthNamesAbbr:
                 formattedMonth = monthNamesAbbr[month.lower()]
 
-        return formattedMonth
+        return int(formattedMonth)
 
     def setUpYear(self, year: Any) -> int:
         formattedYear = 0

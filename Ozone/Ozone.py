@@ -53,7 +53,7 @@ class Ozone:
         strippedText, userInputZone, userOutputZone = Ozone.extractTimeZones(strippedText)
 
         # Get regular expression pattern for set format
-        regex = re.compile(Ozone.getRegex(formatList))
+        regex = Ozone.getRegex(formatList)
 
         # Extract date and time elements from the text using the regex
         userDate, userTimeStart, userTimeEnd = Ozone.extractDateTimeData(strippedText, regex)
@@ -67,8 +67,8 @@ class Ozone:
         userMinutesStart = userTimeStart[1]
         userAmPmStart = userTimeStart[2] if userTimeStart[2] is not None else ""
 
-        userHoursEnd = userTimeEnd[0]
-        userMinutesEnd = userTimeEnd[1]
+        userHoursEnd = userTimeEnd[0] if userTimeEnd[0] is not None else ""
+        userMinutesEnd = userTimeEnd[1] if userTimeEnd[1] is not None else ""
         userAmPmEnd = userTimeEnd[2] if userTimeEnd[2] is not None else ""
 
         try:
@@ -82,7 +82,7 @@ class Ozone:
                 userInputZone
             ).asTimeZone(userOutputZone)
 
-            outputStart = userInputDateTimeStart.strftime("%d.%m.%Y %H:%M ") + f" {userOutputZone}"
+            outputStart = userInputDateTimeStart.strftime("%d.%m.%Y %H:%M ") + f"{userOutputZone}"
 
             if userHoursEnd != "":
 
@@ -96,10 +96,10 @@ class Ozone:
                     userInputZone
                 ).asTimeZone(userOutputZone)
 
-                outputEnd = userInputDateTimeEnd.strftime("%d.%m.%Y %H:%M ") + f" {userOutputZone}"
+                outputEnd = userInputDateTimeEnd.strftime("%d.%m.%Y %H:%M ") + f"{userOutputZone}"
 
         except:
-            pass
+            raise ValueError(f"Unable to set start date from text: {text}")
 
         return outputStart, outputEnd
 
@@ -222,5 +222,3 @@ class Ozone:
 
         return re.compile(f"{dateRegex} {timeRegex}")
 
-
-testOzone = Ozone.ozonize("04.20.2020 04:00 PM CET GMT $12")
