@@ -78,8 +78,8 @@ class Ozone:
                 userYear,
                 userHoursStart,
                 userMinutesStart,
-                userAmPmStart,
-                userInputZone
+                userInputZone,
+                ampm=userAmPmStart
             ).asTimeZone(userOutputZone)
 
             outputStart = userInputDateTimeStart.strftime("%d.%m.%Y %H:%M ") + f"{userOutputZone}"
@@ -92,8 +92,8 @@ class Ozone:
                     userYear,
                     userHoursEnd,
                     userMinutesEnd,
-                    userAmPmEnd,
-                    userInputZone
+                    userInputZone,
+                    ampm=userAmPmEnd
                 ).asTimeZone(userOutputZone)
 
                 outputEnd = userInputDateTimeEnd.strftime("%d.%m.%Y %H:%M ") + f"{userOutputZone}"

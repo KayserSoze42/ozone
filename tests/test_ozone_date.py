@@ -61,7 +61,7 @@ def test_ozone_date_set_attributes(valid_dates) -> None:
         assert str(randomOzoneDate) == currentString
 
         # Test for the datetime.astimezone to return the same as OzoneDate.asTimeZone
-        assert randomDateTime.astimezone(genTimeZone) == randomOzoneDate.asTimeZone(genTimeZone)
+        assert genTimeZone.localize(randomDateTime) == randomOzoneDate.asTimeZone(timezone)
 
 
 

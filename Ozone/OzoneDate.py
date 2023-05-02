@@ -17,24 +17,21 @@ class OzoneDate:
         self.hours = self.setUpHours(hours)
         self.minutes = self.setUpMinutes(minutes)
 
-        self.timezone = self.setUpTimezone(timezone)
+        self.timeZone = self.setUpTimezone(timezone)
 
-        self._dateTime: datetime = datetime(
+        self._dateTime: datetime = pytz.timezone(timezone).localize(datetime(
             self.year,
             self.month,
             self.day,
             self.hours,
             self.minutes
-        )
+        ))
 
     def __str__(self):
         return f"{self.day:02d}.{self.month:02d}.{self.year:04d} {self.hours:02d}:{self.minutes:02d} ({self.ampm}) {self.timezone}"
 
     def asTimeZone(self, timezone: Any) -> Any:
-        if self._dateTime is not None:
-            return self._dateTime.astimezone(timezone)
-        else:
-            return None
+        return self._dateTime.astimezone(pytz.timezone(timezone))
 
     def setUpDay(self, day: Any) -> int:
         formattedDay = 0

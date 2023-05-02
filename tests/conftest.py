@@ -6,10 +6,11 @@ import pytz
 from datetime import datetime
 
 
+validTimezones = [zone for zone in pytz.all_timezones]
+
 @pytest.fixture
 def valid_dates():
     # Generate valid data for testing
-    validTimezones = [zone for zone in pytz.all_timezones]
     validDates = []
 
     # Get time stamp for current time, rounded is good enough imho
@@ -38,10 +39,40 @@ def valid_dates():
 
 
 @pytest.fixture
+def valid_string_dates_dmy_24():
+    # Re/set valid data for testing
+    validStrings = []
+
+    # Get time stamp for current time, rounded is good enough imho
+    currentTimeStampRounded = round(datetime.now().timestamp())
+
+    # Generate 100 valid sets of $dmy$24 string elements
+    for i in range(1, 101):
+        # Get a random date between 1st of January 1970 and now (rounded)
+        randomDate = datetime.fromtimestamp(random.randint(1, currentTimeStampRounded))
+
+        # Get random time zones for input and output
+        randomTimeZoneInput = validTimezones[random.randint(0, len(validTimezones) - 1)]
+        randomTimeZoneOutput = validTimezones[random.randint(0, len(validTimezones) - 1)]
+
+        # Append "20.04.2020 16:20 ETC GMT" type string elements to valid string list
+        validStrings.append([
+            randomDate.strftime("%d.%m.%Y"),
+            randomDate.strftime("%H:%M"),
+            randomTimeZoneInput,
+            randomTimeZoneOutput,
+            "$12"
+        ])
+
+    return validStrings
+
+
+
+
+@pytest.fixture
 def valid_string_dates():
 
     # Generate valid data for testing
-    validTimezones = [zone for zone in pytz.all_timezones]
     validStrings = []
 
     # Get time stamp for current time, rounded is good enough imho
