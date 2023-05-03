@@ -28,7 +28,7 @@ class OzoneDate:
         ))
 
     def __str__(self):
-        return f"{self.day:02d}.{self.month:02d}.{self.year:04d} {self.hours:02d}:{self.minutes:02d} ({self.ampm}) {self.timezone}"
+        return f"{self.day:02d}.{self.month:02d}.{self.year:04d} {self.hours:02d}:{self.minutes:02d} ({self.ampm}) {self.timeZone}"
 
     def asTimeZone(self, timezone: Any) -> Any:
         return self._dateTime.astimezone(pytz.timezone(timezone))

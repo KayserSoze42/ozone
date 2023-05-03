@@ -18,7 +18,7 @@ class Constants(Enum):
 
     ydm = r'\s*(?P<date_year>\d{2,4})\s?[\./-]?\s?(?P<date_day>\d{1,2})\s?[\./-]?\s?(?P<date_month>\d{1,2})\s*'
 
-    ymd = r'\s*(?P<date_year>\d{2,4})\s?[\./-]?\s?(?P<date_month>\d{1,2})\s?[\./-]?\s?(?P<date_date>\d{1,2})\s*'
+    ymd = r'\s*(?P<date_year>\d{2,4})\s?[\./-]?\s?(?P<date_month>\d{1,2})\s?[\./-]?\s?(?P<date_day>\d{1,2})\s*'
 
     Mdy = r''
 

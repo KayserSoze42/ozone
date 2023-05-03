@@ -52,7 +52,7 @@ def test_ozone_date_set_attributes(valid_dates) -> None:
         genTimeZone = pytz.timezone(timezone)
 
         # Test the time zone to match
-        assert randomOzoneDate.timezone == genTimeZone
+        assert randomOzoneDate.timeZone == genTimeZone
 
         # Build the string from the current data
         currentString = f"{day:02}.{month:02}.{year:04} {hour:02}:{minute:02} ({ampm}) {timezone}"
