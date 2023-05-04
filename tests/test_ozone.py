@@ -1,39 +1,7 @@
-import re
-from typing import Tuple
-
 import pytest
-import pytz
 
-from Ozone.OzoneDate import OzoneDate
 from Ozone.Ozone import Ozone
-
-
-def generate_mock_ozone_start_time_only(mockDate, mockTime, mockTimeZoneInput, mockTimeZoneOutput, mockFormat) -> str:
-    dateTimeRegex = Ozone.getRegex(mockFormat.split('$')[1::])
-
-    testData = re.match(dateTimeRegex, f"{mockDate} {mockTime}")
-
-    testAmPm = ""
-    try:
-        testAmPm = testData.group('ampm_start')
-    except:
-        pass
-
-    testDateTime = OzoneDate(
-        testData.group('date_day'),
-        testData.group('date_month'),
-        testData.group('date_year'),
-        testData.group('hours_start'),
-        testData.group('minutes_start'),
-        mockTimeZoneInput,
-        ampm=testAmPm
-    )
-
-    output = testDateTime \
-                         .asTimeZone(mockTimeZoneOutput) \
-                         .strftime("%d.%m.%Y %H:%M") + f" {mockTimeZoneOutput}"
-
-    return output
+from Ozone.testing_tools import OzoneTT
 
 def test_ozonize_mock_logic_and_valid_string_dates_dmy_12(valid_string_dates_dmy_12) -> None:
     # Iterate over the list of valid string elements
@@ -41,7 +9,7 @@ def test_ozonize_mock_logic_and_valid_string_dates_dmy_12(valid_string_dates_dmy
         # Build the string
         testString = f"{testDate} {testTime} {testTimeZoneInput} {testTimeZoneOutput} {testFormat}"
 
-        expectedString = generate_mock_ozone_start_time_only(
+        expectedString = OzoneTT.generate_mock_ozone_start_time_only(
             testDate,
             testTime,
             testTimeZoneInput,
@@ -58,7 +26,7 @@ def test_ozonize_mock_logic_and_valid_string_dates_dmy_24(valid_string_dates_dmy
         # Build the string
         testString = f"{testDate} {testTime} {testTimeZoneInput} {testTimeZoneOutput} {testFormat}"
 
-        expectedString = generate_mock_ozone_start_time_only(
+        expectedString = OzoneTT.generate_mock_ozone_start_time_only(
             testDate,
             testTime,
             testTimeZoneInput,
@@ -75,7 +43,7 @@ def test_ozonize_mock_logic_and_valid_string_dates_mdy_12(valid_string_dates_mdy
         # Build the string
         testString = f"{testDate} {testTime} {testTimeZoneInput} {testTimeZoneOutput} {testFormat}"
 
-        expectedString = generate_mock_ozone_start_time_only(
+        expectedString = OzoneTT.generate_mock_ozone_start_time_only(
             testDate,
             testTime,
             testTimeZoneInput,
@@ -92,7 +60,7 @@ def test_ozonize_mock_logic_and_valid_string_dates_mdy_24(valid_string_dates_mdy
         # Build the string
         testString = f"{testDate} {testTime} {testTimeZoneInput} {testTimeZoneOutput} {testFormat}"
 
-        expectedString = generate_mock_ozone_start_time_only(
+        expectedString = OzoneTT.generate_mock_ozone_start_time_only(
             testDate,
             testTime,
             testTimeZoneInput,
@@ -109,7 +77,7 @@ def test_ozonize_mock_logic_and_valid_string_dates_ydm_12(valid_string_dates_ydm
         # Build the string
         testString = f"{testDate} {testTime} {testTimeZoneInput} {testTimeZoneOutput} {testFormat}"
 
-        expectedString = generate_mock_ozone_start_time_only(
+        expectedString = OzoneTT.generate_mock_ozone_start_time_only(
             testDate,
             testTime,
             testTimeZoneInput,
@@ -126,7 +94,7 @@ def test_ozonize_mock_logic_and_valid_string_dates_ydm_24(valid_string_dates_ydm
         # Build the string
         testString = f"{testDate} {testTime} {testTimeZoneInput} {testTimeZoneOutput} {testFormat}"
 
-        expectedString = generate_mock_ozone_start_time_only(
+        expectedString = OzoneTT.generate_mock_ozone_start_time_only(
             testDate,
             testTime,
             testTimeZoneInput,
@@ -143,7 +111,7 @@ def test_ozonize_mock_logic_and_valid_string_dates_ymd_12(valid_string_dates_ymd
         # Build the string
         testString = f"{testDate} {testTime} {testTimeZoneInput} {testTimeZoneOutput} {testFormat}"
 
-        expectedString = generate_mock_ozone_start_time_only(
+        expectedString = OzoneTT.generate_mock_ozone_start_time_only(
             testDate,
             testTime,
             testTimeZoneInput,
@@ -160,7 +128,7 @@ def test_ozonize_mock_logic_and_valid_string_dates_ymd_24(valid_string_dates_ymd
         # Build the string
         testString = f"{testDate} {testTime} {testTimeZoneInput} {testTimeZoneOutput} {testFormat}"
 
-        expectedString = generate_mock_ozone_start_time_only(
+        expectedString = OzoneTT.generate_mock_ozone_start_time_only(
             testDate,
             testTime,
             testTimeZoneInput,
@@ -169,6 +137,24 @@ def test_ozonize_mock_logic_and_valid_string_dates_ymd_24(valid_string_dates_ymd
         )
 
         assert Ozone.ozonize(testString)[0] == expectedString
+
+
+def test_ozonize_mock_logic_and_valid_string_dates_dmy_12_timeframe(valid_string_dates_dmy_12_timeframe) -> None:
+
+    for testDate, testTimeStart, testTimeEnd, testTimeZoneInput, testTimeZoneOutput, testFormat in valid_string_dates_dmy_12_timeframe:
+
+        testString = f"{testDate} {testTimeStart} - {testTimeEnd} {testTimeZoneInput} {testTimeZoneOutput} {testFormat}"
+
+        expectedStrings = OzoneTT.generate_mock_ozone_timeframe(
+            testDate,
+            testTimeStart,
+            testTimeEnd,
+            testTimeZoneInput,
+            testTimeZoneOutput,
+            testFormat
+        )
+
+        assert Ozone.ozonize(testString) == expectedStrings
 
 
 def test_extract_methods_with_valid_string_data(valid_string_dates) -> None:
