@@ -19,7 +19,7 @@ class Constants(Enum):
 
     ymd = r'\s*(?P<date_year>\d{2,4})\s?[\./-]?\s?(?P<date_month>\d{1,2})\s?[\./-]?\s?(?P<date_day>\d{1,2})\s*'
 
-    Mdy = r''
+    Mdy = r'\s*(?P<date_month>\D{3,13})\s*(?P<date_day>\d{1,2})\s*[-,]\s*(?P<date_year>\d{2,4})\s*'
 
     h12 = r'\s*(?P<hours_start>\d{1,2})\s?:?\s?(?P<minutes_start>\d{0,2})\s?(?P<ampm_start>[AaPp]?\.?[Mm]?)\s?[->]?\s?' \
           r'(?P<hours_end>\d{0,2})\s?:?\s?(?P<minutes_end>\d{0,2})\s?(?P<ampm_end>[AaPp]?\.?[Mm]?)\s*'

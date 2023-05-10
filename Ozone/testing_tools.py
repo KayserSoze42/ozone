@@ -1,5 +1,7 @@
 import re
-from typing import Tuple
+import calendar
+from typing import Tuple, Any
+from datetime import datetime
 
 from Ozone.Ozone import Ozone
 from Ozone.OzoneDate import OzoneDate
@@ -84,3 +86,37 @@ class OzoneTT:
                           .strftime("%d.%m.%Y %H:%M") + f" {mockTimeZoneOutput}"
 
         return outputStart, outputEnd
+
+    @staticmethod
+    def getDateSTRP(text: str, format: str) -> Any:
+        try:
+            return datetime.strptime(text, format)
+        except:
+            return None
+
+    @staticmethod
+    def getMonth(month: Any) -> int:
+        # It will have to make do for now...
+        formattedMonth = 0
+
+        # Try for month number
+        try:
+            return int(month)
+
+        except Exception as e:
+            pass
+
+        # Try for month names and abbreviations
+        monthNames = {str(month).lower(): index for index, month in enumerate(calendar.month_name) if month}
+        monthNamesAbbr = {str(month).lower(): index for index, month in enumerate(calendar.month_abbr) if month}
+
+        if type(month) is str:
+            month = month.strip()
+            if month.lower() in monthNames:
+                formattedMonth = monthNames[month.lower()]
+            elif month.lower() in monthNamesAbbr:
+                formattedMonth = monthNamesAbbr[month.lower()]
+
+        return int(formattedMonth)
+
+

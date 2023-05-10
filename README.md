@@ -1,7 +1,7 @@
 # ozone
 _Python script that combines two of my favorite things: **regex** and **pytz**_
 
-_Like anything else I shared, it's in perpetual development. You can play with the broken version [here](http://www.plaintech.ink/ozone)._
+_Like anything else I shared, it's in perpetual development. You can play with the broken version [here](https://www.plaintech.ink/ozone)._
 
 ## About and Usage
 

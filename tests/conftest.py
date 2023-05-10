@@ -388,6 +388,68 @@ def valid_string_dates_ymd_24():
     return validStrings
 
 @pytest.fixture
+def valid_string_dates_Mdy_12():
+    # Re/set valid data for testing
+    validStrings = []
+
+    # Generate 100 valid sets of $Mdy$12 string elements
+    for i in range(1, 101):
+        # Get a random date between 1st of January 1970 and now (rounded)
+        randomDate = datetime.fromtimestamp(random.randint(1, currentTimeStampRounded))
+
+        # Get random time zones for input and output
+        randomTimeZoneInput = validTimezones[random.randint(0, len(validTimezones) - 1)]
+        randomTimeZoneOutput = validTimezones[random.randint(0, len(validTimezones) - 1)]
+
+        # Append "Apr 20, 2020 4:00 PM ETC GMT $Mdy$12" type string elements to valid string list
+        validStrings.append([
+            randomDate.strftime("%b %d, %Y"),
+            randomDate.strftime("%I:%M %p"),
+            randomTimeZoneInput,
+            randomTimeZoneOutput,
+            "$Mdy$12"
+        ])
+
+        # Append "April 20, 2020 4:00 PM ETC GMT $Mdy$12" type string elements to valid string list
+        validStrings.append([
+            randomDate.strftime("%B %d, %Y"),
+            randomDate.strftime("%I:%M %p"),
+            randomTimeZoneInput,
+            randomTimeZoneOutput,
+            "$Mdy$12"
+        ])
+
+    return validStrings
+
+@pytest.fixture
+def valid_string_elements_Mdy_12_dmy_12():
+    # Re/set valid data for testing
+    validStrings = []
+
+    # Generate 100 valid sets of $Mdy$12 string elements
+    for i in range(1, 101):
+        # Get a random date between 1st of January 1970 and now (rounded)
+        randomDate = datetime.fromtimestamp(random.randint(1, currentTimeStampRounded))
+
+        # Get random time zones for input and output
+        randomTimeZoneInput = validTimezones[random.randint(0, len(validTimezones) - 1)]
+        randomTimeZoneOutput = validTimezones[random.randint(0, len(validTimezones) - 1)]
+
+        # Append "Apr 20, 2020" type string elements to valid string list
+        validStrings.append([
+            randomDate.strftime("%b %d, %Y"),
+            randomDate.strftime("%d.%m.%Y")
+        ])
+
+        # Append "April 20, 2020" type string elements to valid string list
+        validStrings.append([
+            randomDate.strftime("%B %d, %Y"),
+            randomDate.strftime("%d.%m.%Y")
+        ])
+
+    return validStrings
+
+@pytest.fixture
 def valid_string_dates_dmy_12_timeframe():
     # Re/set valid data for testing
     validStrings = []

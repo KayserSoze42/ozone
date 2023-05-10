@@ -19,13 +19,17 @@ class OzoneDate:
 
         self.timeZone = self.setUpTimezone(timezone)
 
-        self._dateTime: datetime = pytz.timezone(timezone).localize(datetime(
-            self.year,
-            self.month,
-            self.day,
-            self.hours,
-            self.minutes
-        ))
+        try:
+            self._dateTime: datetime = pytz.timezone(timezone).localize(datetime(
+                self.year,
+                self.month,
+                self.day,
+                self.hours,
+                self.minutes
+            ))
+
+        except ValueError as ve:
+            print(ve.__traceback__)
 
     def __str__(self):
         return f"{self.day:02d}.{self.month:02d}.{self.year:04d} {self.hours:02d}:{self.minutes:02d} ({self.ampm}) {self.timeZone}"
@@ -69,6 +73,7 @@ class OzoneDate:
         monthNamesAbbr = {str(month).lower(): index for index, month in enumerate(calendar.month_abbr) if month}
 
         if type(month) is str:
+            month = month.strip()
             if month.lower() in monthNames:
                 formattedMonth = monthNames[month.lower()]
             elif month.lower() in monthNamesAbbr:
