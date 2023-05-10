@@ -11,7 +11,7 @@ _Like anything else I shared, it's in perpetual development. You can play with t
 
 _The insides are held together by duct tape, but if you feed it a string in a format of:_
 
-    DATE TIME (TIMEEND) TIMEZONE_INPUT TIMEZONE_OUTPUT ($FORMAT)
+    DATE TIME (TIME_END) TIMEZONE_INPUT TIMEZONE_OUTPUT ($FORMAT)
     
 _It will convert the date and time, from and to the timezones provided and return a tuple with strings:_
 
@@ -19,7 +19,7 @@ _It will convert the date and time, from and to the timezones provided and retur
     
 _And optional:_
 
-    DATE TIMEEND TIMEZONE_OUTPUT
+    DATE TIME_END TIMEZONE_OUTPUT
     
 _Format is optional, and if nothing is passed default is being used:_
 
