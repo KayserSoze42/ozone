@@ -1,6 +1,7 @@
 import re
 
 from Ozone.Ozone import Ozone, Constants
+from Ozone.testing_tools import OzoneTT
 
 
 def test_regex_flow_with_valid_string_data(valid_string_dates) -> None:
@@ -60,6 +61,18 @@ def test_regex_separated_logic_with_valid_string_data(valid_string_dates) -> Non
 
         # Test for the format regex to match the passed format
         assert genFormat == re.search(Constants.format.value, genFormat)[0]
+
+def test_Mdy_regex_with_valid_string_data(valid_string_elements_Mdy_12_dmy_12) -> None:
+
+    # Test that, basically, after finding the month using regex, it returns the same value as dmy formatted date
+    for genMdyDate, gendmyDate in valid_string_elements_Mdy_12_dmy_12:
+
+        testData = re.match(Constants.Mdy.value, genMdyDate)
+        testDate = OzoneTT.getDateSTRP(gendmyDate, "%d.%m.%Y")
+
+        testMonthValue = OzoneTT.getMonth(testData.group("date_month"))
+        assert testDate.month == testMonthValue
+
 
 
 def test_regex_flow_with_invalid_string_data(invalid_string_dates) -> None:

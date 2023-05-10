@@ -138,6 +138,22 @@ def test_ozonize_mock_logic_and_valid_string_dates_ymd_24(valid_string_dates_ymd
 
         assert Ozone.ozonize(testString)[0] == expectedString
 
+def test_ozonize_mock_logic_and_valid_string_dates_Mdy_12(valid_string_dates_Mdy_12) -> None:
+    # Iterate over the list of valid string elements
+    for testDate, testTime, testTimeZoneInput, testTimeZoneOutput, testFormat in valid_string_dates_Mdy_12:
+        # Build the string
+        testString = f"{testDate} {testTime} {testTimeZoneInput} {testTimeZoneOutput} {testFormat}"
+
+        expectedString = OzoneTT.generate_mock_ozone_start_time_only(
+            testDate,
+            testTime,
+            testTimeZoneInput,
+            testTimeZoneOutput,
+            testFormat
+        )
+
+        assert Ozone.ozonize(testString)[0] == expectedString
+
 
 def test_ozonize_mock_logic_and_valid_string_dates_dmy_12_timeframe(valid_string_dates_dmy_12_timeframe) -> None:
 
