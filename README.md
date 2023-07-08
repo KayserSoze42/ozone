@@ -1,5 +1,5 @@
 # ozone
-_Python script that combines two of my favorite things: **regex** and **pytz**_
+_Python script for converting date and time using my favorite thing: **regex**_
 
 _Like anything else I shared, it's in perpetual development. You can play with the broken version [here](https://www.plaintech.ink/ozone)._
 

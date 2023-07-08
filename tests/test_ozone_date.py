@@ -1,5 +1,5 @@
 from datetime import datetime
-import pytz
+from dateutil import tz
 
 from Ozone.OzoneDate import OzoneDate
 
@@ -49,7 +49,7 @@ def test_ozone_date_set_attributes(valid_dates) -> None:
         assert randomOzoneDate.ampm == ampm
 
         # Set current time zone
-        genTimeZone = pytz.timezone(timezone)
+        genTimeZone = tz.gettz(timezone)
 
         # Test the time zone to match
         assert randomOzoneDate.timeZone == genTimeZone

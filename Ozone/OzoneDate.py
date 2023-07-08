@@ -4,6 +4,7 @@ import calendar
 import pytz
 
 from datetime import datetime
+from dateutil import tz
 
 
 class OzoneDate:
@@ -128,7 +129,12 @@ class OzoneDate:
         formattedZone = ""
 
         try:
-            formattedZone = pytz.timezone(timezone)
+            formattedZone = tz.gettz(timezone)
+            # will play around with custom regex here as well
+            # as the previous could be considered semi-isolated env,
+            # the zones themselves, im not rly sure
+            #
+            # we shall see shell, i guess
 
         except Exception as e:
             pass
